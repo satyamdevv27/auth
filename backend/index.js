@@ -1,22 +1,29 @@
 import express from "express";
-import Dotenv from "dotenv";
+import dotenv from "dotenv";
 import cors from "cors";
 
-import "./models/db.js";
-import handleusersignup from "./controllers/authcontroller.js";
+import "./models/db.js"; // MongoDB connection
+import authRoutes from "./routes/authroutes.js";
+
+dotenv.config();
+
 const app = express();
-Dotenv.config();
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 
+/* -------- Middlewares -------- */
 app.use(cors());
-app.use(express.json()); // MANDATORY: This allows your app to read JSON data
-app.use(express.urlencoded({ extended: false })); // Helpful for form submissions
-app.use("/user", handleusersignup);
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
+/* -------- Routes -------- */
+app.use("/user", authRoutes);
+
+/* -------- Health Route -------- */
 app.get("/", (req, res) => {
-  res.send("api working fine");
+  res.send("API working fine");
 });
 
+/* -------- Start Server -------- */
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

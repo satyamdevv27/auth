@@ -1,9 +1,15 @@
-import express from 'express'
-import {handleusersignup} from "../controllers/authcontroller"
-const router = express.Router()
+import express from "express";
 
+import {
+  handleusersignup,
+  handleuserlogin,
+  verifySignupOTP,
+} from "../controllers/authcontroller.js";
 
-router.post("/" , handleusersignup)
-router.post("login")
+const router = express.Router();
+
+router.post("/signup", handleusersignup);
+router.post("/login", handleuserlogin);
+router.post("/verify-otp", verifySignupOTP);
 
 export default router;
