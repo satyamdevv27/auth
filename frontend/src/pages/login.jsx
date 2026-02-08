@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,23 +19,37 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch("http://localhost:8080/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await res.json();
-    alert(data.message);
+      const data = await res.json();
 
-    if (!res.ok) return;
+      alert(data.message);
 
-    setFormData({
-      email: "",
-      password: "",
-    });
+      if (!res.ok) return;
+
+      // store token only on success
+      localStorage.setItem("token", data.token);
+
+      // clear form
+      setFormData({
+        email: "",
+        password: "",
+      });
+
+      // redirect to dashboard
+      navigate("/dashboard");
+
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
+    }
   };
 
   return (
@@ -77,10 +94,29 @@ function Login() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition cursor-pointer"
         >
           Login
         </button>
+
+        <p className="text-center mt-4">
+          Don't have an account?{" "}
+          <Link
+            to="/signup"
+            className="text-blue-500 hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
+
+        <p className="text-center mt-2">
+          <Link
+            to="/forgot-password"
+            className="text-blue-500 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </p>
       </form>
     </div>
   );
