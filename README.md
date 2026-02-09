@@ -1,5 +1,3 @@
----
-```markdown
 # 🔐 MERN Auth System with Email OTP
 
 A secure authentication system built using the MERN stack.  
