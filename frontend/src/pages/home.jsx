@@ -4,7 +4,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex justify-center items-center px-4">
+    <div className="min-h-screen bg-linear-to-br from-blue-100 to-indigo-200 flex justify-center items-center px-4">
 
       <div className="bg-white shadow-xl rounded-2xl p-10 text-center max-w-md w-full">
 

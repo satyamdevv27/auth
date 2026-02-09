@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function Signup() {
+  const url = "https://auth-backend-xzsl.onrender.com"
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,7 +29,7 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await fetch("http://localhost:8080/user/signup", {
+    const res = await fetch(`${url}/user/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await fetch("http://localhost:8080/user/verify-otp", {
+    const res = await fetch(`${url}/user/verify-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +101,7 @@ function Signup() {
     setLoading(true);
 
     const res = await fetch(
-      "http://localhost:8080/user/resend-otp",
+      `${url}/user/resend-otp`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

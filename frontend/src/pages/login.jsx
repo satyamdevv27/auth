@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
+  const url = "https://auth-backend-xzsl.onrender.com"
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/user/login", {
+      const res = await fetch(`${url}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

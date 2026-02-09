@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function ForgotPassword() {
   const navigate = useNavigate();
+  const url ="https://auth-backend-xzsl.onrender.com"
 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -18,7 +19,7 @@ function ForgotPassword() {
 
     try {
       const res = await fetch(
-        "http://localhost:8080/user/send-reset-otp",
+        `${url}/user/send-reset-otp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -44,7 +45,7 @@ function ForgotPassword() {
 
     try {
       const res = await fetch(
-        "http://localhost:8080/user/reset-password",
+        `${url}/user/reset-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
