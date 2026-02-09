@@ -11,7 +11,17 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 /* -------- Middlewares -------- */
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://auth-app-devv27.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
