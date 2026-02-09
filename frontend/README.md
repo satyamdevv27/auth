@@ -1,16 +1,189 @@
-# React + Vite
+```md
+# 🔐 Full Stack Authentication System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A secure authentication system built using **React, Node.js, Express, and MongoDB** featuring OTP email verification, JWT authentication, password reset, and protected routes.
 
-Currently, two official plugins are available:
+This project demonstrates a production-style authentication flow used in modern web applications.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✅ User Authentication
+- User Signup with Email OTP verification
+- Login with JWT token authentication
+- Protected dashboard route
+- Logout functionality
 
-## Expanding the ESLint configuration
+### ✅ Email Verification
+- OTP sent via email
+- OTP verification required before account activation
+- OTP resend functionality
+- OTP expiration handling
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### ✅ Password Security
+- Password hashing using bcrypt
+- Secure login using hashed password comparison
+- Reset password via OTP
+
+### ✅ Password Reset Flow
+1. User requests password reset
+2. OTP sent to email
+3. User verifies OTP
+4. New password is securely updated
+
+### ✅ Security Features
+- JWT token authentication
+- Password hashing with bcrypt
+- Protected routes
+- Token-based session handling
+- OTP expiration validation
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- React (Vite)
+- React Router
+- Tailwind CSS
+- Fetch API
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB & Mongoose
+- JWT Authentication
+- bcrypt
+- Email service (SMTP / API)
+
+### Deployment
+- Backend deployed on Render
+- Frontend deployed on Vercel
+
+---
+
+## 📂 Project Structure
+
+```
+
+auth/
+│
+├── backend/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   ├── utils/
+│   └── index.js
+│
+└── frontend/
+├── src/
+│   ├── pages/
+│   └── components/
+└── App.jsx
+
+```
+
+---
+
+## 🔄 Authentication Flow
+
+### Signup Flow
+```
+
+User enters details
+↓
+OTP sent to email
+↓
+User verifies OTP
+↓
+Account activated
+
+```
+
+### Login Flow
+```
+
+User logs in
+↓
+JWT token generated
+↓
+Token stored in browser
+↓
+Access protected routes
+
+```
+
+### Password Reset Flow
+```
+
+User requests reset
+↓
+OTP sent
+↓
+OTP verified
+↓
+Password updated
+
+```
+
+---
+
+## 🔑 Environment Variables (Backend)
+
+Create `.env` file inside backend folder:
+
+```
+
+PORT=8080
+MONGO_URI=your_mongodb_connection
+JWT_SECRET=your_secret_key
+EMAIL_USER=your_email
+EMAIL_PASS=your_email_password
+
+````
+
+---
+
+## ▶ Running Locally
+
+### Backend
+```bash
+cd backend
+npm install
+npm run dev
+````
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📌 Future Improvements
+
+* Refresh tokens
+* Google OAuth login
+* Rate limiting
+* Account lock after multiple failed attempts
+* Profile management
+* Role-based access
+
+---
+
+## 👨‍💻 Author
+
+**Satyam** — Full Stack Developer
+
+```
+
+---
+
+If you want next, we can make a **resume-ready project description** or a **portfolio project card** for this project.
+```
