@@ -1,38 +1,31 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import PendingUser from "../models/pendingUser.js";
 import { generateOTP, getOTPExpiry } from "../utils/otp.js";
 import { sendOTPEmail } from "../services/mailService.js";
 
 /* ---------------- SIGNUP ---------------- */
 export const handleusersignup = async (req, res) => {
   const { name, email, password } = req.body;
+
+  const hashedPassword = await bcrypt.hash(password, 10);
   const otp = generateOTP();
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 8);
+  // remove old pending signup
+  await PendingUser.findOneAndDelete({ email });
 
-    await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      otp,
-      otpExpires: getOTPExpiry(),
-    });
+  await PendingUser.create({
+    name,
+    email,
+    password: hashedPassword,
+    otp,
+    otpExpires: getOTPExpiry(),
+  });
 
-     sendOTPEmail(email, otp);
+   sendOTPEmail(email, otp);
 
-    return res.status(201).json({
-      message: "OTP sent to email",
-    });
-
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({ error: "Email already exists!" });
-    }
-
-    return res.status(500).json({ error: error.message });
-  }
+  res.json({ message: "OTP sent" });
 };
 
 /* ---------------- LOGIN ---------------- */
@@ -48,7 +41,6 @@ export const handleuserlogin = async (req, res) => {
       });
     }
 
-    // ✅ bcrypt compare
     const isMatch = await bcrypt.compare(
       password,
       user.password
@@ -57,12 +49,6 @@ export const handleuserlogin = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         message: "Invalid email or password",
-      });
-    }
-
-    if (!user.isVerified) {
-      return res.status(401).json({
-        message: "Please verify email first",
       });
     }
 
@@ -91,21 +77,54 @@ export const handleuserlogin = async (req, res) => {
 export const verifySignupOTP = async (req, res) => {
   const { email, otp } = req.body;
 
-  const user = await User.findOne({ email });
+  const pendingUser = await PendingUser.findOne({ email });
 
-  if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+  if (
+    !pendingUser ||
+    pendingUser.otp !== otp ||
+    pendingUser.otpExpires < Date.now()
+  ) {
     return res.status(400).json({
       message: "Invalid or expired OTP",
     });
   }
 
-  user.isVerified = true;
-  user.otp = null;
-  user.otpExpires = null;
+  // create actual user now
+  await User.create({
+    name: pendingUser.name,
+    email: pendingUser.email,
+    password: pendingUser.password,
+    isVerified: true,
+  });
 
-  await user.save();
+  // remove temporary user
+  await PendingUser.deleteOne({ email });
 
-  res.json({ message: "Account verified!" });
+  res.json({ message: "Account created successfully!" });
+};
+
+/* ---------------- RESEND SIGNUP OTP ---------------- */
+export const resendSignupOTP = async (req, res) => {
+  const { email } = req.body;
+
+  const pendingUser = await PendingUser.findOne({ email });
+
+  if (!pendingUser) {
+    return res.status(404).json({
+      message: "Signup session not found",
+    });
+  }
+
+  const otp = generateOTP();
+
+  pendingUser.otp = otp;
+  pendingUser.otpExpires = getOTPExpiry();
+
+  await pendingUser.save();
+
+  await sendOTPEmail(email, otp);
+
+  res.json({ message: "OTP resent" });
 };
 
 /* ---------------- SEND RESET OTP ---------------- */
@@ -126,7 +145,8 @@ export const sendResetOTP = async (req, res) => {
   user.otpExpires = getOTPExpiry();
 
   await user.save();
-   sendOTPEmail(email, otp);
+
+  await sendOTPEmail(email, otp);
 
   res.json({ message: "Reset OTP sent" });
 };
@@ -137,13 +157,16 @@ export const resetPassword = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (!user || user.otp !== otp || user.otpExpires < Date.now()) {
+  if (
+    !user ||
+    user.otp !== otp ||
+    user.otpExpires < Date.now()
+  ) {
     return res.status(400).json({
       message: "Invalid or expired OTP",
     });
   }
 
-  // ✅ hash new password
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   user.password = hashedPassword;

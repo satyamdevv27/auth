@@ -5,7 +5,8 @@ import {
   handleuserlogin,
   verifySignupOTP,
   sendResetOTP,
-  resetPassword
+  resetPassword,
+  resendSignupOTP
 } from "../controllers/authcontroller.js";
 import authMiddleware from "../middleware/auth.js";
 
@@ -19,6 +20,8 @@ router.get("/profile", authMiddleware, (req, res) => {
 });
 router.post("/send-reset-otp", sendResetOTP);
 router.post("/reset-password", resetPassword);
+router.post("/resend-otp", resendSignupOTP);
+
 
 
 export default router;
