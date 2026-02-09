@@ -63,10 +63,9 @@ This project demonstrates a production-style authentication flow used in modern 
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
-
 auth/
 │
 ├── backend/
@@ -79,11 +78,10 @@ auth/
 │   └── index.js
 │
 └── frontend/
-├── src/
-│   ├── pages/
-│   └── components/
-└── App.jsx
-
+    └── src/
+        ├── pages/
+        ├── components/
+        └── App.jsx
 ```
 
 ---
