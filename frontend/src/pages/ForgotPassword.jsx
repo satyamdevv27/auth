@@ -9,47 +9,62 @@ function ForgotPassword() {
   const [newPassword, setNewPassword] = useState("");
 
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  // Step 1: Send OTP
+  /* ---------- Send OTP ---------- */
   const sendOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const res = await fetch(
-      "http://localhost:8080/user/send-reset-otp",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      }
-    );
+    try {
+      const res = await fetch(
+        "http://localhost:8080/user/send-reset-otp",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
 
-    const data = await res.json();
-    alert(data.message);
+      const data = await res.json();
+      alert(data.message);
 
-    if (res.ok) setStep(2);
+      if (res.ok) setStep(2);
+    } catch {
+      alert("Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Step 2: Reset password
+  /* ---------- Reset Password ---------- */
   const resetPassword = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    const res = await fetch(
-      "http://localhost:8080/user/reset-password",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          otp,
-          newPassword,
-        }),
-      }
-    );
+    try {
+      const res = await fetch(
+        "http://localhost:8080/user/reset-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            otp,
+            newPassword,
+          }),
+        }
+      );
 
-    const data = await res.json();
-    alert(data.message);
+      const data = await res.json();
+      alert(data.message);
 
-    if (res.ok) navigate("/login");
+      if (res.ok) navigate("/login");
+    } catch {
+      alert("Password reset failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,9 +87,10 @@ function ForgotPassword() {
 
             <button
               type="submit"
-              className="bg-blue-500 text-white w-full py-2 rounded cursor-pointer"
+              disabled={loading}
+              className="bg-blue-500 text-white w-full py-2 rounded disabled:bg-gray-400"
             >
-              Send OTP
+              {loading ? "Sending OTP..." : "Send OTP"}
             </button>
           </form>
         )}
@@ -102,9 +118,12 @@ function ForgotPassword() {
 
             <button
               type="submit"
-              className="bg-green-500 text-white w-full py-2 rounded"
+              disabled={loading}
+              className="bg-green-500 text-white w-full py-2 rounded disabled:bg-gray-400"
             >
-              Reset Password
+              {loading
+                ? "Resetting password..."
+                : "Reset Password"}
             </button>
           </form>
         )}

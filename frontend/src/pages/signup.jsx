@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function Signup() {
@@ -10,6 +10,11 @@ function Signup() {
 
   const [otp, setOtp] = useState("");
   const [showOtpField, setShowOtpField] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  /* Resend OTP states */
+  const [timer, setTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
 
   const handlechange = (e) => {
     setFormData({
@@ -18,9 +23,10 @@ function Signup() {
     });
   };
 
-  // Step 1: Signup
+  /* ---------- Signup ---------- */
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const res = await fetch("http://localhost:8080/user/signup", {
       method: "POST",
@@ -35,12 +41,17 @@ function Signup() {
 
     if (res.ok) {
       setShowOtpField(true);
+      setTimer(30);
+      setCanResend(false);
     }
+
+    setLoading(false);
   };
 
-  // Step 2: OTP verify
+  /* ---------- OTP Verify ---------- */
   const verifyOtp = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const res = await fetch("http://localhost:8080/user/verify-otp", {
       method: "POST",
@@ -55,13 +66,54 @@ function Signup() {
 
     const data = await res.json();
 
-    alert(data.message || data.error || "Something went wrong");
+    alert(data.message || data.error);
 
     if (res.ok) {
       setShowOtpField(false);
       setFormData({ name: "", email: "", password: "" });
       setOtp("");
     }
+
+    setLoading(false);
+  };
+
+  /* ---------- Timer countdown ---------- */
+  useEffect(() => {
+    if (!showOtpField) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showOtpField]);
+
+  /* ---------- Resend OTP ---------- */
+  const resendOtp = async () => {
+    setLoading(true);
+
+    const res = await fetch(
+      "http://localhost:8080/user/resend-otp",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      }
+    );
+
+    const data = await res.json();
+    alert(data.message);
+
+    setTimer(30);
+    setCanResend(false);
+    setLoading(false);
   };
 
   return (
@@ -100,10 +152,11 @@ function Signup() {
             />
 
             <button
+              disabled={loading}
               type="submit"
-              className="bg-blue-500 text-white w-full py-2 rounded"
+              className="bg-blue-500 text-white w-full py-2 rounded disabled:bg-gray-400"
             >
-              Signup
+              {loading ? "Sending OTP..." : "Signup"}
             </button>
 
             <p className="mt-4 text-center">
@@ -131,9 +184,22 @@ function Signup() {
 
             <button
               type="submit"
-              className="bg-green-500 text-white w-full py-2 rounded cursor-pointer"
+              disabled={loading}
+              className="bg-green-500 text-white w-full py-2 rounded disabled:bg-gray-400"
             >
-              Verify OTP
+              {loading ? "Verifying..." : "Verify OTP"}
+            </button>
+
+            {/* Resend OTP */}
+            <button
+              type="button"
+              onClick={resendOtp}
+              disabled={!canResend || loading}
+              className="text-blue-500 mt-3 text-sm disabled:text-gray-400"
+            >
+              {canResend
+                ? "Resend OTP"
+                : `Resend OTP in ${timer}s`}
             </button>
 
             <p className="mt-4 text-center">

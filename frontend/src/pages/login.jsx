@@ -9,6 +9,8 @@ function Login() {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -18,6 +20,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await fetch("http://localhost:8080/user/login", {
@@ -29,7 +32,6 @@ function Login() {
       });
 
       const data = await res.json();
-
       alert(data.message);
 
       if (!res.ok) return;
@@ -43,12 +45,13 @@ function Login() {
         password: "",
       });
 
-      // redirect to dashboard
       navigate("/dashboard");
 
     } catch (err) {
       console.error(err);
       alert("Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,9 +97,10 @@ function Login() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition cursor-pointer"
+          disabled={loading}
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition disabled:bg-gray-400"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="text-center mt-4">
