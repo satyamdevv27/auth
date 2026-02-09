@@ -1,20 +1,12 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // false for TLS
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOTPEmail = async (email, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  await resend.emails.send({
+    from: "Auth App <onboarding@resend.dev>",
     to: email,
-    subject: "Email Verification OTP",
-    text: `Your OTP is ${otp}. It expires in 5 minutes.`,
+    subject: "Your OTP Code",
+    html: `<p>Your OTP is <strong>${otp}</strong>. Valid for 5 minutes.</p>`,
   });
 };
